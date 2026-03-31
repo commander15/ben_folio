@@ -1,7 +1,7 @@
+import 'package:ben_folio/models/model.dart';
 import 'package:flutter/widgets.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class Project {
+class Project extends Model {
   final String? logoPath;
   final String name;
   final String overview;
@@ -11,64 +11,121 @@ class Project {
   final List<ProgrammingLanguage> languages;
   final List<Technology> technologies;
 
-  final List<String> screenshotsPaths;
-  final List<String>? screencastsPaths;
+  final List<Screenshot> screenshotsPaths;
+  final List<Screencast>? screencastsPaths;
 
   bool get openSource => githubLink != null;
   final Uri? githubLink;
 
-  const Project({this.logoPath, required this.name, required this.overview, this.description, this.customer, required this.languages, required this.technologies, required this.screenshotsPaths, this.screencastsPaths, this.githubLink});
+  const Project({
+    super.id,
+    super.createdAt,
+    super.updatedAt,
+    super.deletedAt,
+    this.logoPath,
+    required this.name,
+    required this.overview,
+    this.description,
+    this.customer,
+    required this.languages,
+    required this.technologies,
+    required this.screenshotsPaths,
+    this.screencastsPaths,
+    this.githubLink,
+  });
+
+  Project.fromJson(super.json)
+    : logoPath = json['logo_path'],
+      name = json['name'],
+      overview = json['overview'],
+      description = json['description'],
+      customer = json['customer'] == null ? null : Customer(name: 'ee'),
+      languages = json['languages'] == null
+          ? List.empty()
+          : (json['languages'] as JsonArray)
+                .map((e) => ProgrammingLanguage.fromJson(e))
+                .toList(),
+      technologies = json['technologies'] == null
+          ? List.empty()
+          : (json['technologies'] as JsonArray)
+                .map((e) => Technology.fromJson(e))
+                .toList(),
+      screenshotsPaths = json['screenshots'] == null
+          ? List.empty()
+          : (json['screenshots'] as JsonArray)
+                .map((e) => Screenshot.fromJson(e))
+                .toList(),
+      screencastsPaths = json['screencasts'] == null
+          ? List.empty()
+          : (json['screencasts'] as JsonArray)
+                .map((e) => Screencast.fromJson(e))
+                .toList(),
+      githubLink = json['github_link'],
+      super.fromJson();
 }
 
-class Customer {
+class Customer extends Model {
   final String? logoPath;
   final String name;
 
-  const Customer({this.logoPath, required this.name});
+  const Customer({
+    super.id,
+    super.createdAt,
+    super.updatedAt,
+    super.deletedAt,
+    this.logoPath,
+    required this.name,
+  });
+
+  Customer.fromJson(super.json)
+    : logoPath = json['logo_path'],
+      name = json['name'],
+      super.fromJson();
 }
 
-class ProgrammingLanguage {
-  final Widget icon;
+class TechThing extends Model {
+  final String logoPath;
   final String name;
 
-  const ProgrammingLanguage({required this.icon, required this.name});
+  const TechThing({
+    super.id,
+    super.createdAt,
+    super.updatedAt,
+    super.deletedAt,
+    required this.logoPath,
+    required this.name,
+  });
 
-  factory ProgrammingLanguage.qml() => ProgrammingLanguage.helper(logo: 'logo_qml.png', name: 'QML');
-  factory ProgrammingLanguage.js() => ProgrammingLanguage.helper(logo: 'logo_js.png', name: 'JavaScript');
-  factory ProgrammingLanguage.php() => ProgrammingLanguage.helper(logo: 'logo_php.png', name: 'PHP');
-  factory ProgrammingLanguage.cpp() => ProgrammingLanguage.helper(logo: 'logo_cpp.png', name: 'C++');
-  factory ProgrammingLanguage.c() => ProgrammingLanguage.helper(logo: 'logo_c.png', name: 'C');
-  factory ProgrammingLanguage.dart() => ProgrammingLanguage.helper(logo: 'logo_dart.png', width: 128, name: 'Dart');
-
-  factory ProgrammingLanguage.helper({required String logo, required String name, double? width, double? height}) => ProgrammingLanguage(icon: Image.asset('images/$logo', width: width, height: height), name: name);
+  TechThing.fromJson(super.object)
+    : logoPath = object['logo_path'],
+      name = object['name'],
+      super.fromJson();
 }
 
-class Technology {
-  final Widget icon;
-  final String name;
+typedef ProgrammingLanguage = TechThing;
+typedef Technology = TechThing;
 
-  const Technology({required this.icon, required this.name});
+class ScreenThing extends Model {
+  final String? label;
+  final String? description;
+  final String path;
 
-  factory Technology.qt({Color? color, double? size}) => Technology.custom(logo: 'logo_qt.png', name: 'Qt');
-  factory Technology.flutter() => Technology.standard(logo: FontAwesomeIcons.flutter, name: 'Flutter');
+  const ScreenThing({
+    super.id,
+    super.createdAt,
+    super.updatedAt,
+    super.deletedAt,
+    this.label,
+    this.description,
+    required this.path,
+  });
 
-  factory Technology.laravel({Color? color, double? size}) => Technology.custom(logo: 'logo_laravel.png', rounded: true, name: 'Laravel');
-  factory Technology.django({Color? color, double? size}) => Technology.custom(logo: 'logo_django.png', rounded: true, name: 'Django');
-
-  factory Technology.arduino() => Technology.custom(logo: 'logo_arduino.png', name: 'Arduino');
-  factory Technology.espidf() => Technology.custom(logo: 'logo_espressif.png', rounded: true, width: 92, name: 'ESP IDF');
-
-  factory Technology.platformio() => Technology.custom(logo: 'logo_platformio.png', name: 'PlatformIO');
-
-  factory Technology.textual({required String name}) => Technology(icon: Text(name, style: TextStyle(fontWeight: FontWeight.bold),), name: name);
-
-  factory Technology.custom({required String logo, required String name, bool rounded = false, double width = 32, double height = 32}) {
-    Widget widget = Image.asset("images/$logo", width: width, height: height);
-    if (rounded) {
-      widget = ClipRRect(borderRadius: BorderRadius.circular(32.0), child: widget);
-    }
-    return Technology(icon: widget, name: name);
-  }
-
-  factory Technology.standard({required IconData logo, required String name, Color? color, double? size}) => Technology(icon: Icon(logo, color: color, size: size), name: name);
+  ScreenThing.fromJson(super.object)
+    : label = object['label'],
+      description = object['description'],
+      path = object['path'],
+      super.fromJson();
 }
+
+typedef Screencast = ScreenThing;
+typedef Screenshot = ScreenThing;

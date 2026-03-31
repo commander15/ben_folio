@@ -1,3 +1,7 @@
+import 'package:dio/dio.dart';
+
 class System {
-  System();
+  final Dio cdn;
+
+  System({required String cdn}) : cdn = Dio(BaseOptions(baseUrl: cdn));
 }

@@ -47,7 +47,12 @@ class _MainPageState extends State<MainPage> {
       MainPageItem(
         icon: Icon(FontAwesomeIcons.house),
         label: "Home",
-        widget: HomePage(me: meService, projects: projectsService, onProjectsTap: () => setPage(1),),
+        widget: HomePage(
+          me: meService,
+          projects: projectsService,
+          onResumeDownloadTap: openResume,
+          onProjectsTap: () => setPage(1),
+        ),
       ),
       MainPageItem(
         icon: Icon(FontAwesomeIcons.folder),
@@ -68,6 +73,14 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
+  void openResume() {
+    launchUrl(
+      Uri.parse(
+        'https://drive.google.com/file/d/1Gq0MRVya_QGUNKQtNpcu5PopmrOWgerO/view?usp=sharing',
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ResponsiveBuilder(
@@ -77,12 +90,14 @@ class _MainPageState extends State<MainPage> {
   }
 
   Widget buildLogo(BuildContext context) {
-    return Card(child: Center(child: Text("AB")));
+    return CircleAvatar(
+            child: Text('AB', style: TextStyle(fontSize: 24)),
+          );
   }
 
   Widget buildResumeButton(BuildContext context) {
     return ElevatedButton(
-      onPressed: () => launchUrl(Uri.parse('https://drive.google.com/file/d/1Gq0MRVya_QGUNKQtNpcu5PopmrOWgerO/view?usp=sharing')),
+      onPressed: openResume,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [Icon(Icons.download_rounded), Text("CV")],
@@ -110,17 +125,15 @@ class _MainPageState extends State<MainPage> {
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              SizedBox(height: 16.0,),
               buildLogo(context),
+              SizedBox(height: 8.0,),
               Expanded(
                 child: NavigationRail(
                   labelType: NavigationRailLabelType.all,
                   onDestinationSelected: setPage,
                   destinations: destinations,
                   selectedIndex: _index,
-                  trailing: RotatedBox(quarterTurns: -45, child: Text('AMADOU BENJAMAIN', style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ))),
                 ),
               ),
             ],
@@ -142,7 +155,10 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        leading: Container(margin: EdgeInsets.only(left: 6.0, right: 6.0), child: CircleAvatar(child: Text('AB', style: TextStyle(fontSize: 24)))),
+        leading: Container(
+          margin: EdgeInsets.only(left: 6.0, right: 6.0),
+          child: buildLogo(context),
+        ),
         title: Text("Amadou Benjamain"),
         actions: [buildResumeButton(context)],
       ),

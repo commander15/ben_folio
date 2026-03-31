@@ -1,3 +1,6 @@
+typedef JsonObject = Map<String, dynamic>;
+typedef JsonArray = List<JsonObject>;
+
 class Model {
   final int? id;
   final DateTime? createdAt;
@@ -6,9 +9,9 @@ class Model {
 
   const Model({this.id, this.createdAt, this.updatedAt, this.deletedAt});
 
-  Model.fromJson(Map<String, dynamic> data)
-    : id = data['id'],
-      createdAt = data['created_at'],
-      updatedAt = data['updated_at'],
-      deletedAt = data['deleted_at'];
+  Model.fromJson(JsonObject json)
+    : id = json['id'],
+      createdAt = json['created_at'],
+      updatedAt = json['updated_at'],
+      deletedAt = json['deleted_at'];
 }

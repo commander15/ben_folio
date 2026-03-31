@@ -2,12 +2,14 @@ import 'package:ben_folio/components/contact_widget.dart';
 import 'package:ben_folio/components/technology_widget.dart';
 import 'package:ben_folio/models/person.dart';
 import 'package:ben_folio/models/project.dart';
+import 'package:ben_folio/services/system.dart';
 import 'package:flutter/material.dart';
 
 class DeveloperCard extends StatelessWidget {
   final Developer developer;
+  final System system;
 
-  const DeveloperCard({super.key, required this.developer});
+  const DeveloperCard({super.key, required this.developer, required this.system});
 
   @override
   Widget build(BuildContext context) {
@@ -62,9 +64,9 @@ class DeveloperCard extends StatelessWidget {
   }
 
   Widget buildAvatar(BuildContext context) {
-    ImageProvider photo = (developer.photoUrl == null
+    ImageProvider photo = (developer.photoPath == null
         ? AssetImage('images/dev_profile.jpeg')
-        : NetworkImage(developer.photoUrl!));
+        : NetworkImage(developer.photoPath!));
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(500),
@@ -98,17 +100,10 @@ class DeveloperCard extends StatelessWidget {
     }
 
     // Tech stack
-    final List<Technology> stack = [
-      Technology.qt(),
-      Technology.flutter(),
-      Technology.laravel(),
-      Technology.django(),
-      Technology.arduino(),
-      Technology.espidf(),
-    ];
+    final List<Technology> stack = developer.technologies ?? List.empty();
 
     List<Widget> techs = List.generate(stack.length, (index) {
-      return TechnologyWidget(technology: stack[index]);
+      return TechnologyWidget(technology: stack[index], system: system);
     }, growable: false);
 
     // Contacts
@@ -117,7 +112,7 @@ class DeveloperCard extends StatelessWidget {
     ) {
       final Contact contact = developer.contacts![index];
       return IconButton(
-        onPressed: () => contact.contact(),
+        onPressed: () => contact.trigger(),
         icon: ContactWidget(contact: contact),
       );
     }, growable: false);

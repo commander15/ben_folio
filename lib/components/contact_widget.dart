@@ -9,6 +9,6 @@ class ContactWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Tooltip(message: contact.value, child: contact.icon ?? Icon(FontAwesomeIcons.question));
+    return Tooltip(message: contact.value, child: Icon(contact.adaptedIcon()));
   }
 }

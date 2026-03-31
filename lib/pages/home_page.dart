@@ -1,12 +1,12 @@
 import 'package:ben_folio/components/developer_card.dart';
-import 'package:ben_folio/components/project_card.dart';
 import 'package:ben_folio/components/responsive_builder.dart';
 import 'package:ben_folio/services/me_service.dart';
 import 'package:ben_folio/services/project_service.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
-  final void Function()? onProjectsTap;
+  final void Function() onResumeDownloadTap;
+  final void Function() onProjectsTap;
   final MeService me;
   final ProjectService projects;
 
@@ -14,24 +14,22 @@ class HomePage extends StatelessWidget {
     super.key,
     required this.me,
     required this.projects,
-    this.onProjectsTap,
+    required this.onResumeDownloadTap,
+    required this.onProjectsTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return ResponsiveBuilder(
       desktopBuilder: (context, constraints) =>
-          buildContent(context, addSpacer: true),
+          SingleChildScrollView(child: buildContent(context, addSpacer: true)),
       mobileBuilder: (context, constraints) =>
           SingleChildScrollView(child: buildContent(context, addSpacer: false)),
     );
   }
 
   Widget buildContent(BuildContext context, {required bool addSpacer}) {
-    final List<Widget> last = addSpacer ? [Spacer()] : [];
-    final screen = MediaQuery.of(context);
-
-    return Container(
+    Widget pureContent = Container(
       margin: EdgeInsets.all(8.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -44,6 +42,7 @@ class HomePage extends StatelessWidget {
                   if (snapshot.hasData) {
                     return DeveloperCard(
                       developer: snapshot.requireData.object!,
+                      system: me.system,
                     );
                   } else {
                     return SizedBox();
@@ -75,7 +74,7 @@ class HomePage extends StatelessWidget {
               SizedBox(height: 16.0),
               Center(
                 child: ElevatedButton(
-                  onPressed: () => launchUrl(Uri.parse('')),
+                  onPressed: onResumeDownloadTap,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     spacing: 8.0,
@@ -101,9 +100,10 @@ class HomePage extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 16.0),
-            ] +
-            last,
+            ] + [ if (addSpacer) Spacer() ]
       ),
     );
+
+    return SingleChildScrollView(child: pureContent);
   }
 }

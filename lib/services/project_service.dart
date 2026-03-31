@@ -1,59 +1,36 @@
+import 'package:ben_folio/models/model.dart';
 import 'package:ben_folio/models/project.dart';
 import 'package:ben_folio/services/service.dart';
 
 class ProjectService extends Service {
-  late List<Project> _projects;
+  List<Project>? _projects;
 
-  ProjectService({required super.system}) {
-    final blueRemote = Project(
-      logoPath: '/blue_remote/logo.png',
-      name: 'Blue Remote',
-      overview: 'Linking IR and BLE.',
-      description:
-          'Blue Remote is .... blabl alagjglsqjglmsdjfklgjksdmfjgldjfglmsdjgflmsdgfklgsdmlgfdl',
-      languages: [
-        ProgrammingLanguage.cpp(),
-        ProgrammingLanguage.c(),
-        ProgrammingLanguage.dart(),
-      ],
-      technologies: [
-        Technology.flutter(),
-        Technology.django(),
-        Technology.arduino(),
-        Technology.espidf(),
-        Technology.platformio(),
-      ],
-      screenshotsPaths: [
-        "/blue_remote/screenshots/1.home.png",
-        "/blue_remote/screenshots/2.profiles.png",
-        "/blue_remote/screenshots/3.canal+.png",
-        "/blue_remote/screenshots/4.digits.png",
-        "/blue_remote/screenshots/5.hisense.png",
-        "/blue_remote/screenshots/6.colors.png",
-        "/blue_remote/screenshots/7.smart.png",
-        "/blue_remote/screenshots/8.hex.png",
-        "/blue_remote/screenshots/9.protocol.png",
-      ],
-    );
+  ProjectService({required super.system});
 
-    final test = Project(
-      logoPath: '/blue_remote/logo.png',
-      name: "Sodec Sure",
-      overview: 'Insurance app',
-      customer: Customer(logoPath: '/sodec_sure/SODECOTON.png', name: 'SODECOTON'),
-      languages: [ProgrammingLanguage.cpp(), ProgrammingLanguage.c(), ProgrammingLanguage.php()],
-      technologies: [Technology.qt(), Technology.laravel()],
-      screenshotsPaths: [],
-    );
+  Future<ServiceResponse<Project>> index() async {
+    if (_projects != null) {
+      return ServiceResponse(objects: _projects);
+    }
 
-    _projects = [blueRemote, test];
+    _projects = List.empty(growable: true);
+
+    final indexResponse = await system.cdn.get('/projects/index.json');
+    final projects = indexResponse.data['data'] as JsonArray;
+
+    for (JsonObject project in projects) {
+      final projectDataResponse = await system.cdn.get('/projects/${project['name']}/manifest.json');
+      final projectObject = Project.fromJson(projectDataResponse.data);
+      _projects!.add(projectObject);
+    }
+    
+    return ServiceResponse(objects: _projects);
   }
 
-  Future<ServiceResponse<Project>> index() {
-    return Future.value(ServiceResponse(objects: _projects));
-  }
+  Future<ServiceResponse<Project>> get(int id) async {
+    if (_projects == null || id < 1 || id >= _projects!.length) {
+      return ServiceResponse(objects: []);
+    }
 
-  Future<ServiceResponse<Project>> get(int id) {
-    return Future.value(ServiceResponse(objects: [_projects[id - 1]]));
+    return ServiceResponse(objects: [_projects![id - 1]]);
   }
 }

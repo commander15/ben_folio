@@ -3,7 +3,7 @@ import 'package:ben_folio/services/system.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyApp(system: System()));
+  runApp(MyApp(system: System(cdn: 'http://localhost:9000')));
 }
 
 class MyApp extends StatelessWidget {

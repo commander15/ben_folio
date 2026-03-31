@@ -1,15 +1,18 @@
 import 'dart:math';
 
 import 'package:ben_folio/components/screenshot_widget.dart';
+import 'package:ben_folio/components/technology_widget.dart';
 import 'package:ben_folio/models/project.dart';
+import 'package:ben_folio/services/system.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ProjectCard extends StatelessWidget {
   final Project project;
+  final System system;
+  final Function()? onCVDownloadTap;
 
-  const ProjectCard({super.key, required this.project});
+  const ProjectCard({super.key, required this.project, required this.system, this.onCVDownloadTap});
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +112,7 @@ class ProjectCard extends StatelessWidget {
                                 return Padding(
                                   padding: EdgeInsets.all(8.0),
                                   child: ScreenshotWidget(
-                                    path: project.screenshotsPaths[index],
+                                    path: project.screenshotsPaths[index].path,
                                     size: 256,
                                   ),
                                 );
@@ -155,7 +158,7 @@ class ProjectCard extends StatelessWidget {
                                 child: SizedBox(
                                   width: 24,
                                   height: 24,
-                                  child: tech.icon,
+                                  child: TechnologyWidget(technology: tech, system: system),
                                 ),
                               ),
                             ),
@@ -166,7 +169,7 @@ class ProjectCard extends StatelessWidget {
                                 FontAwesomeIcons.github,
                                 color: Colors.white,
                               ),
-                              onPressed: () => launchUrl(project.githubLink!),
+                              onPressed: onCVDownloadTap,
                             ),
                         ],
                       ),
@@ -180,11 +183,4 @@ class ProjectCard extends StatelessWidget {
       ),
     );
   }
-}
-
-Future<void> launchUrl(Uri url) async {
-  if (!await canLaunchUrl(url)) {
-    throw Exception('Could not launch $url');
-  }
-  await launchUrl(url);
 }

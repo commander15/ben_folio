@@ -11,6 +11,16 @@ class ProjectsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.info_outline_rounded, color: Colors.red, size: 64,),
+        Center(
+      child: Text('Not ready yet !', style: TextStyle(fontSize: 18),),
+    )
+      ],
+    );
+
+    return Column(
       children: [
         Expanded(
           child: FutureBuilder(
@@ -20,7 +30,7 @@ class ProjectsPage extends StatelessWidget {
                 final List<Project> projects = snapshot.requireData.objects!;
                 return ListView.builder(
                   itemBuilder: (context, index) =>
-                      ProjectCard(project: projects[index]),
+                      ProjectCard(project: projects[index], system: projectsService.system),
                   itemCount: projects.length,
                 );
               } else {
